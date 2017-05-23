@@ -9,6 +9,6 @@ namespace asp_application1.Models
     public class City: MapUnit
     {
         [Required]
-        public string Name;
+        public string Name { get; set; }
     }
 }
