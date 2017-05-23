@@ -15,12 +15,16 @@ namespace asp_application1.Data
         {
         }
 
+        public DbSet<City> Cities { get; set; }
+        public DbSet<Road> Roads { get; set; }
+        public DbSet<Pass> Passes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            // Customize the ASP.NET Identity model and override the defaults if needed.
-            // For example, you can rename the ASP.NET Identity table names and more.
-            // Add your customizations after calling base.OnModelCreating(builder);
+            builder.Entity<City>().ToTable("City");
+            builder.Entity<Road>().ToTable("Road");
+            builder.Entity<Pass>().ToTable("Pass");
         }
     }
 }
