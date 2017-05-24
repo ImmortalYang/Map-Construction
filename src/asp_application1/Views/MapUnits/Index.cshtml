@@ -1,0 +1,135 @@
+@model asp_application1.Models.MapUnitViewModels.MapUnitIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<h3>Cities</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Cost</th>
+            <th>Name</th>
+            <th>X</th>
+            <th>Y</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var city in Model.Cities) {
+        <tr>
+            <td></td>
+            <td>@((int) city.Cost)</td>
+            <td>@city.Name</td>
+            <td>@city.X</td>
+            <td>@city.Y</td>
+            <td>
+                <a asp-action="Edit" asp-controller="Cities" asp-route-id="@city.ID">Edit</a> |
+                <a asp-action="Details" asp-controller="Cities" asp-route-id="@city.ID">Details</a> |
+                <a asp-action="Delete" asp-controller="Cities" asp-route-id="@city.ID">Delete</a>
+            </td>
+        </tr>
+}
+        <tr>
+            <td></td>
+            <td>
+                <a asp-action="Create" asp-controller="Cities" class="btn btn-info">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Add New
+                </a>
+            </td>
+            <td></td><td></td><td></td><td></td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Roads</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Cost</th>
+            <th>Orientation</th>
+            <th>X</th>
+            <th>Y</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var road in Model.Roads)
+        {
+            <tr>
+                <td></td>
+                <td>@((int)road.Cost)</td>
+                <td>@road.Orientation</td>
+                <td>@road.X</td>
+                <td>@road.Y</td>
+                <td>
+                    <a asp-action="Edit" asp-controller="Roads" asp-route-id="@road.ID">Edit</a> |
+                    <a asp-action="Details" asp-controller="Roads" asp-route-id="@road.ID">Details</a> |
+                    <a asp-action="Delete" asp-controller="Roads" asp-route-id="@road.ID">Delete</a>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td></td>
+            <td>
+                <a asp-action="Create" asp-controller="Roads" class="btn btn-info">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Add New
+                </a>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Passes</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Cost</th>
+            <th>Duration</th>
+            <th>X</th>
+            <th>Y</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pass in Model.Passes)
+        {
+            <tr>
+                <td></td>
+                <td>@((int)pass.Cost)</td>
+                <td>@pass.Duration</td>
+                <td>@pass.X</td>
+                <td>@pass.Y</td>
+                <td>
+                    <a asp-action="Edit" asp-controller="Passes" asp-route-id="@pass.ID">Edit</a> |
+                    <a asp-action="Details" asp-controller="Passes" asp-route-id="@pass.ID">Details</a> |
+                    <a asp-action="Delete" asp-controller="Passes" asp-route-id="@pass.ID">Delete</a>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td></td>
+            <td>
+                <a asp-action="Create" asp-controller="Passes" class="btn btn-info">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    Add New
+                </a>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>

@@ -35,9 +35,9 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     @if (User.IsInRole("Member") || User.IsInRole("Admin")) { 
-                    <li><a asp-area="" asp-controller="Cities" asp-action="Index">City</a></li>
-                    <li><a asp-area="" asp-controller="Roads" asp-action="Index">Road</a></li>
-                    <li><a asp-area="" asp-controller="Passes" asp-action="Index">Pass</a></li>
+                    <li><a asp-area="" asp-controller="MapUnits" asp-action="Index">View 1</a></li>
+                    <li><a asp-area="" asp-controller="" asp-action="">View 2</a></li>
+                    <li><a asp-area="" asp-controller="" asp-action="">View 3</a></li>
                     }
                  </ul>
                  @await Html.PartialAsync("_LoginPartial")

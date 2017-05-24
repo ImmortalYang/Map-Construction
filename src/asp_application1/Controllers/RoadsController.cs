@@ -13,57 +13,13 @@ using Microsoft.AspNetCore.Identity;
 namespace asp_application1.Controllers
 {
     [Authorize(Roles = ("Admin,Member"))]
-    public class RoadsController : Controller
+    public class RoadsController : MapUnitsController
     {
-        private readonly ApplicationDbContext _context;
-        private UserManager<ApplicationUser> _userManager;
-
-        public RoadsController(ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+        public RoadsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
-            _context = context;
-            _userManager = userManager;  
-        }
-
-        // GET: Roads
-        public async Task<IActionResult> Index()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var roads = await _context.Roads
-                .Where(r => r.ApplicationUserId == user.Id)
-                .AsNoTracking()
-                .ToListAsync();
-            return View(roads);
-        }
-
-        // GET: Roads/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var road = await _context.Roads
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.ID == id);
-            if (road == null)
-            {
-                return NotFound();
-            }
-
-            return View(road);
-        }
-
-        // GET: Roads/Create
-        public IActionResult Create()
-        {
-            return View();
         }
 
         // POST: Roads/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Orientation,X,Y")] Road road)
@@ -91,97 +47,17 @@ namespace asp_application1.Controllers
             return View(road);
         }
 
-        // GET: Roads/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        protected override async Task<MapUnit> GetUnitByIdAsync(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var road = await _context.Roads
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.ID == id);
-            if (road == null)
-            {
-                return NotFound();
-            }
-            return View(road);
+            return await _context.Roads.SingleOrDefaultAsync(r => r.ID == id);
         }
 
-        // POST: Roads/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost, ActionName("Edit")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPost(int? id)
+        protected override async Task<bool> TryUpdateMapUnitModelAsync(MapUnit model)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var roadToUpdate = await _context.Roads
-                .SingleOrDefaultAsync(c => c.ID == id);
-            if (await TryUpdateModelAsync(roadToUpdate,
-                "",
-                c => c.Orientation, c => c.X, c => c.Y))
-            {
-                try
-                {
-                    var user = await _userManager.GetUserAsync(User);
-                    if (await roadToUpdate.UnitLocationOccupied(_context, user))
-                    {
-                        ModelState.AddModelError("", "The location is occupied by another unit.");
-                        return View(roadToUpdate);
-                    }
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction("Index");
-                }
-                catch (DbUpdateException /* ex */)
-                {
-                    //Log the error (uncomment ex variable name and write a log.)
-                    ModelState.AddModelError("", "Unable to save changes. " +
-                    "Try again, and if the problem persists, " +
-                    "see your system administrator.");
-                }
-            }
-            return View(roadToUpdate);
+            if (!(model is Road)) return false;
+            return await TryUpdateModelAsync(model as Road, "",
+                c => c.Orientation, c => c.X, c => c.Y);
         }
 
-        // GET: Roads/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var road = await _context.Roads
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.ID == id);
-            if (road == null)
-            {
-                return NotFound();
-            }
-
-            return View(road);
-        }
-
-        // POST: Roads/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var roadToDelete = new Road() { ID = id };
-            _context.Entry(roadToDelete).State = EntityState.Deleted;
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
-        }
-
-        private bool RoadExists(int id)
-        {
-            return _context.Roads.Any(e => e.ID == id);
-        }
     }
 }
