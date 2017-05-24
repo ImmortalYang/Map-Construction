@@ -36,14 +36,17 @@ namespace asp_application1.Models
             var locationOccupiedByCity = await context.Cities
                 .Where(c => c.ApplicationUserId == user.Id)
                 .Where(c => c.X == this.X && c.Y == this.Y)
+                .Where(c => c.ID != this.ID)
                 .AsNoTracking().AnyAsync();
             var locationOccupiedByRoad = await context.Roads
                 .Where(c => c.ApplicationUserId == user.Id)
                 .Where(c => c.X == this.X && c.Y == this.Y)
+                .Where(c => c.ID != this.ID)
                 .AsNoTracking().AnyAsync();
             var locationOccupiedByPass = await context.Passes
                 .Where(c => c.ApplicationUserId == user.Id)
                 .Where(c => c.X == this.X && c.Y == this.Y)
+                .Where(c => c.ID != this.ID)
                 .AsNoTracking().AnyAsync();
             if(locationOccupiedByCity || locationOccupiedByRoad || locationOccupiedByPass)
             {

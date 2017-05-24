@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using asp_application1.Data;
 using asp_application1.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace asp_application1.Controllers
 {
@@ -15,17 +16,24 @@ namespace asp_application1.Controllers
     public class PassesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private UserManager<ApplicationUser> _userManager;
 
-        public PassesController(ApplicationDbContext context)
+        public PassesController(ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager)
         {
-            _context = context;    
+            _context = context;
+            _userManager = userManager;
         }
 
         // GET: Passes
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Passes.Include(p => p.ApplicationUser);
-            return View(await applicationDbContext.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+            var passes = await _context.Passes
+                .Where(c => c.ApplicationUserId == user.Id)
+                .AsNoTracking()
+                .ToListAsync();
+            return View(passes);
         }
 
         // GET: Passes/Details/5
@@ -36,7 +44,9 @@ namespace asp_application1.Controllers
                 return NotFound();
             }
 
-            var pass = await _context.Passes.SingleOrDefaultAsync(m => m.ID == id);
+            var pass = await _context.Passes
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.ID == id);
             if (pass == null)
             {
                 return NotFound();
@@ -48,7 +58,6 @@ namespace asp_application1.Controllers
         // GET: Passes/Create
         public IActionResult Create()
         {
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -57,15 +66,29 @@ namespace asp_application1.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,ApplicationUserId,Cost,Duration,X,Y")] Pass pass)
+        public async Task<IActionResult> Create([Bind("Duration,X,Y")] Pass pass)
         {
             if (ModelState.IsValid)
             {
+                var user = await _userManager.GetUserAsync(User);
+                pass.Cost = Costs.Pass;
+                pass.ApplicationUserId = user.Id;
+                if (await pass.UnitLocationOccupied(_context, user))
+                {
+                    ModelState.AddModelError("", "The location is occupied by another unit.");
+                    return View(pass);
+                }
+                if (user.Balance < (int)pass.Cost)
+                {
+                    ModelState.AddModelError("", "You have insufficient balance to build this unit.");
+                    return View(pass);
+                }
+                user.Balance -= (int)pass.Cost;
                 _context.Add(pass);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction("Index");
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", pass.ApplicationUserId);
             return View(pass);
         }
 
@@ -77,49 +100,54 @@ namespace asp_application1.Controllers
                 return NotFound();
             }
 
-            var pass = await _context.Passes.SingleOrDefaultAsync(m => m.ID == id);
+            var pass = await _context.Passes
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.ID == id);
             if (pass == null)
             {
                 return NotFound();
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", pass.ApplicationUserId);
             return View(pass);
         }
 
         // POST: Passes/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,ApplicationUserId,Cost,Duration,X,Y")] Pass pass)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != pass.ID)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            var passToUpdate = await _context.Passes
+                .SingleOrDefaultAsync(c => c.ID == id);
+            if (await TryUpdateModelAsync(passToUpdate,
+                "",
+                c => c.Duration, c => c.X, c => c.Y))
             {
                 try
                 {
-                    _context.Update(pass);
+                    var user = await _userManager.GetUserAsync(User);
+                    if (await passToUpdate.UnitLocationOccupied(_context, user))
+                    {
+                        ModelState.AddModelError("", "The location is occupied by another unit.");
+                        return View(passToUpdate);
+                    }
                     await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!PassExists(pass.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.");
                 }
-                return RedirectToAction("Index");
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", pass.ApplicationUserId);
-            return View(pass);
+
+            return View(passToUpdate);
         }
 
         // GET: Passes/Delete/5
@@ -130,7 +158,9 @@ namespace asp_application1.Controllers
                 return NotFound();
             }
 
-            var pass = await _context.Passes.SingleOrDefaultAsync(m => m.ID == id);
+            var pass = await _context.Passes
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.ID == id);
             if (pass == null)
             {
                 return NotFound();
@@ -144,8 +174,8 @@ namespace asp_application1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var pass = await _context.Passes.SingleOrDefaultAsync(m => m.ID == id);
-            _context.Passes.Remove(pass);
+            var passToDelete = new Pass() { ID = id };
+            _context.Entry(passToDelete).State = EntityState.Deleted;
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
