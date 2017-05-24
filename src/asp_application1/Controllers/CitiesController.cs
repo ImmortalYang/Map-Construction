@@ -66,14 +66,26 @@ namespace asp_application1.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Cost,Name,X,Y")] City city)
+        public async Task<IActionResult> Create([Bind("Name,X,Y")] City city)
         {
             var user = await _userManager.GetUserAsync(User);
             if (ModelState.IsValid)
-            {
+            { 
                 city.ApplicationUserId = user.Id;
+                if(await city.UnitLocationOccupied(_context, user))
+                {
+                    ModelState.AddModelError("", "The location is occupied by another unit.");
+                    return View(city);
+                }
+                if(user.Balance < (int)city.Cost)
+                {
+                    ModelState.AddModelError("", "You have insufficient balance to build this unit.");
+                    return View(city);
+                }
+                user.Balance -= (int)city.Cost;
                 _context.Add(city);
                 await _context.SaveChangesAsync();
+                
                 return RedirectToAction("Index");
             }
             return View(city);
@@ -112,10 +124,16 @@ namespace asp_application1.Controllers
                 .SingleOrDefaultAsync(c => c.ID == id);
             if(await TryUpdateModelAsync(cityToUpdate, 
                 "", 
-                c => c.Cost, c => c.Name, c => c.X, c => c.Y))
+                c => c.Name, c => c.X, c => c.Y))
             {
                 try
                 {
+                    var user = await _userManager.GetUserAsync(User);
+                    if (await cityToUpdate.UnitLocationOccupied(_context, user))
+                    {
+                        ModelState.AddModelError("", "The location is occupied by another unit.");
+                        return View(cityToUpdate);
+                    }
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Index");
                 }

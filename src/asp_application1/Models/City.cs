@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace asp_application1.Models
 {
-    public class City: MapUnit
+    public class City : MapUnit
     {
         [Required]
         public string Name { get; set; }

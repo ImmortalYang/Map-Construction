@@ -9,7 +9,7 @@ namespace asp_application1.Models
     // Add profile data for application users by adding properties to the ApplicationUser class
     public class ApplicationUser : IdentityUser
     {
-        public double Balance { get; set; }
+        public int Balance { get; set; }
 
         public ICollection<City> Cities { get; set; }
         public ICollection<Road> Roads { get; set; }
