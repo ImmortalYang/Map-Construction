@@ -12,21 +12,15 @@ namespace asp_application1.Models
         public Orientation Orientation { get; set; }
     }
 
-    [Flags]
     public enum Orientation
     {
-        None = 0,
-        Left = 1,
-        Right = 2,
-        Top = 4,
-        Bottom = 8,
-        TopLeft = Top | Left,
-        TopRight = Top | Right,
-        BottomLeft = Bottom | Left,
-        BottomRight = Bottom | Right,
-        Horizontal = Left | Right,
-        Vertical = Top | Bottom,
-        All = Left | Right | Top | Bottom
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
+        Horizontal,
+        Vertical,
+        All
     }
 
 }

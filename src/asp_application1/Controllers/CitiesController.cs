@@ -67,10 +67,11 @@ namespace asp_application1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,X,Y")] City city)
-        {
-            var user = await _userManager.GetUserAsync(User);
+        { 
             if (ModelState.IsValid)
-            { 
+            {
+                var user = await _userManager.GetUserAsync(User);
+                city.Cost = Costs.City;
                 city.ApplicationUserId = user.Id;
                 if(await city.UnitLocationOccupied(_context, user))
                 {

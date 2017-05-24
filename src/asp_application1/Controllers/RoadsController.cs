@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using asp_application1.Data;
 using asp_application1.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace asp_application1.Controllers
 {
@@ -15,17 +16,24 @@ namespace asp_application1.Controllers
     public class RoadsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private UserManager<ApplicationUser> _userManager;
 
-        public RoadsController(ApplicationDbContext context)
+        public RoadsController(ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager)
         {
-            _context = context;    
+            _context = context;
+            _userManager = userManager;  
         }
 
         // GET: Roads
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Roads.Include(r => r.ApplicationUser);
-            return View(await applicationDbContext.ToListAsync());
+            var user = await _userManager.GetUserAsync(User);
+            var roads = await _context.Roads
+                .Where(r => r.ApplicationUserId == user.Id)
+                .AsNoTracking()
+                .ToListAsync();
+            return View(roads);
         }
 
         // GET: Roads/Details/5
@@ -36,7 +44,9 @@ namespace asp_application1.Controllers
                 return NotFound();
             }
 
-            var road = await _context.Roads.SingleOrDefaultAsync(m => m.ID == id);
+            var road = await _context.Roads
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.ID == id);
             if (road == null)
             {
                 return NotFound();
@@ -48,7 +58,6 @@ namespace asp_application1.Controllers
         // GET: Roads/Create
         public IActionResult Create()
         {
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -57,15 +66,28 @@ namespace asp_application1.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,ApplicationUserId,Cost,Orientation,X,Y")] Road road)
-        {
+        public async Task<IActionResult> Create([Bind("Orientation,X,Y")] Road road)
+        {  
             if (ModelState.IsValid)
             {
+                var user = await _userManager.GetUserAsync(User);
+                road.Cost = Costs.Road;
+                road.ApplicationUserId = user.Id;
+                if (await road.UnitLocationOccupied(_context, user))
+                {
+                    ModelState.AddModelError("", "The location is occupied by another unit.");
+                    return View(road);
+                }
+                if (user.Balance < (int)road.Cost)
+                {
+                    ModelState.AddModelError("", "You have insufficient balance to build this unit.");
+                    return View(road);
+                }
+                user.Balance -= (int)road.Cost;
                 _context.Add(road);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", road.ApplicationUserId);
             return View(road);
         }
 
@@ -77,49 +99,54 @@ namespace asp_application1.Controllers
                 return NotFound();
             }
 
-            var road = await _context.Roads.SingleOrDefaultAsync(m => m.ID == id);
+            var road = await _context.Roads
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.ID == id);
             if (road == null)
             {
                 return NotFound();
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", road.ApplicationUserId);
             return View(road);
         }
 
         // POST: Roads/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,ApplicationUserId,Cost,Orientation,X,Y")] Road road)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != road.ID)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var roadToUpdate = await _context.Roads
+                .SingleOrDefaultAsync(c => c.ID == id);
+            if (await TryUpdateModelAsync(roadToUpdate,
+                "",
+                c => c.Orientation, c => c.X, c => c.Y))
             {
                 try
                 {
-                    _context.Update(road);
+                    var user = await _userManager.GetUserAsync(User);
+                    if (await roadToUpdate.UnitLocationOccupied(_context, user))
+                    {
+                        ModelState.AddModelError("", "The location is occupied by another unit.");
+                        return View(roadToUpdate);
+                    }
                     await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!RoadExists(road.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists, " +
+                    "see your system administrator.");
                 }
-                return RedirectToAction("Index");
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "Id", road.ApplicationUserId);
-            return View(road);
+            return View(roadToUpdate);
         }
 
         // GET: Roads/Delete/5
@@ -130,7 +157,9 @@ namespace asp_application1.Controllers
                 return NotFound();
             }
 
-            var road = await _context.Roads.SingleOrDefaultAsync(m => m.ID == id);
+            var road = await _context.Roads
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.ID == id);
             if (road == null)
             {
                 return NotFound();
@@ -144,8 +173,8 @@ namespace asp_application1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var road = await _context.Roads.SingleOrDefaultAsync(m => m.ID == id);
-            _context.Roads.Remove(road);
+            var roadToDelete = new Road() { ID = id };
+            _context.Entry(roadToDelete).State = EntityState.Deleted;
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
