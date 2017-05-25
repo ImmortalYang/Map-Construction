@@ -1,0 +1,51 @@
+@model asp_application1.Models.MapUnitViewModels.MapUnitIndexViewModel
+
+@{
+    ViewData["Title"] = "FilterIndex";
+}
+
+<h2>Map</h2>
+
+<form class="form-inline" asp-controller="MapUnits" asp-action="FilterIndex">
+    <div class="form-group">
+        <label asp-for="ShowCity">City</label>
+        <input class="form-control" asp-for="ShowCity" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ShowRoad">Road</label>
+        <input class="form-control" asp-for="ShowRoad" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ShowRoad">Pass</label>
+        <input class="form-control" asp-for="ShowPass" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-default">Apply Filter</button>
+    </div>
+</form>
+
+<div class="map">
+    @for (int row = 1; row <= 20; row++)
+    {
+        <div class="map-row" data-row-index="@row">
+            @for (int col = 1; col <= 20; col++)
+            {
+                <div class="map-unit" data-row-index="@row" data-col-index="@col"></div>
+            }
+        </div>
+    }
+</div>
+<script type="text/javascript">
+@foreach(var city in Model.Cities)
+{
+    @:$(".map-unit[data-row-index='@city.Y'][data-col-index='@city.X']").addClass('map-city');
+}
+@foreach(var road in Model.Roads)
+{
+    @:$(".map-unit[data-row-index='@road.Y'][data-col-index='@road.X']").addClass('map-road-@road.Orientation');
+}
+@foreach(var pass in Model.Passes)
+{
+    @:$(".map-unit[data-row-index='@pass.Y'][data-col-index='@pass.X']").addClass('map-pass');
+}
+</script>

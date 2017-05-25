@@ -37,6 +37,12 @@ namespace asp_application1.Controllers
                 await GetIndexViewModelAsync());
         }
 
+        public async Task<IActionResult> FilterIndex(MapUnitIndexViewModel model)
+        {
+            return View("~/Views/MapUnits/FilterIndex.cshtml",
+                await GetIndexViewModelAsync(model.ShowCity, model.ShowRoad, model.ShowPass));
+        }
+
         public IActionResult Create()
         {
             return View();
@@ -141,20 +147,26 @@ namespace asp_application1.Controllers
             throw new NotImplementedException();
         }
 
-        private async Task<MapUnitIndexViewModel> GetIndexViewModelAsync()
+        private async Task<MapUnitIndexViewModel> GetIndexViewModelAsync(
+                                            bool showCity = true, 
+                                            bool showRoad = true, 
+                                            bool showPass = true)
         {
             var user = await _userManager.GetUserAsync(User);
             var model = new MapUnitIndexViewModel()
             {
-                Cities = await _context.Cities
+                ShowCity = showCity, 
+                ShowRoad = showRoad, 
+                ShowPass = showPass, 
+                Cities = showCity ? await _context.Cities
                     .Where(c => c.ApplicationUserId == user.Id)
-                    .AsNoTracking().ToListAsync(),
-                Roads = await _context.Roads
+                    .AsNoTracking().ToListAsync() : new List<City>(),
+                Roads = showRoad ? await _context.Roads
                     .Where(r => r.ApplicationUserId == user.Id)
-                    .AsNoTracking().ToListAsync(),
-                Passes = await _context.Passes
+                    .AsNoTracking().ToListAsync() : new List<Road>(),
+                Passes = showPass ? await _context.Passes
                     .Where(p => p.ApplicationUserId == user.Id)
-                    .AsNoTracking().ToListAsync()
+                    .AsNoTracking().ToListAsync() : new List<Pass>()
             };
             return model;
         }

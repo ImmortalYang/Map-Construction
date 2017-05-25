@@ -54,7 +54,7 @@
                     @if (User.IsInRole("Member") || User.IsInRole("Admin")) { 
                     <li><a asp-area="" asp-controller="MapUnits" asp-action="Index">View 1</a></li>
                     <li><a asp-area="" asp-controller="MapUnits" asp-action="GraphicIndex">View 2</a></li>
-                    <li><a asp-area="" asp-controller="MapUnits" asp-action="">View 3</a></li>
+                    <li><a asp-area="" asp-controller="MapUnits" asp-action="FilterIndex">View 3</a></li>
                     }
                  </ul>
                  @await Html.PartialAsync("_LoginPartial")
