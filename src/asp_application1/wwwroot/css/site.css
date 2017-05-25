@@ -1,7 +1,3 @@
-/*Set the parent position to non-static first
-    Otherwise this rule has no effects
-*/
-/*Text border effect*/
 body {
   padding-top: 50px;
   padding-bottom: 20px;
@@ -51,12 +47,12 @@ textarea {
   width: 1000px;
   height: 1000px;
 }
-.map-row {
+.map__row {
   height: 50px;
   display: block;
   zoom: 1;
 }
-.map-row::after {
+.map__row::after {
   content: " ";
   display: block;
   font-size: 0;
@@ -64,36 +60,36 @@ textarea {
   clear: both;
   visibility: hidden;
 }
-.map-unit {
+.map__unit {
   float: left;
   width: 50px;
   height: 50px;
-}
-.map-city {
-  background: url('../../images/map/city.jpg');
   background-size: contain;
 }
-.map-pass {
+.map__unit--city {
+  background: url('../../images/map/city.jpg');
+}
+.map__unit--pass {
   background: url('../../images/map/pass.jpg');
 }
-.map-road-TopLeft {
+.map__unit--road-TopLeft {
   background: url('../../images/map/road-top-left.jpg');
 }
-.map-road-TopRight {
+.map__unit--road-TopRight {
   background: url('../../images/map/road-top-right.jpg');
 }
-.map-road-BottomLeft {
+.map__unit--road-BottomLeft {
   background: url('../../images/map/road-bottom-left.jpg');
 }
-.map-road-BottomRight {
+.map__unit--road-BottomRight {
   background: url('../../images/map/road-bottom-right.jpg');
 }
-.map-road-Horizontal {
+.map__unit--road-Horizontal {
   background: url('../../images/map/road-horizontal.jpg');
 }
-.map-road-Vertical {
+.map__unit--road-Vertical {
   background: url('../../images/map/road-vertical.jpg');
 }
-.map-road-All {
+.map__unit--road-All {
   background: url('../../images/map/road-all.jpg');
 }

@@ -27,10 +27,10 @@
 <div class="map">
     @for (int row = 1; row <= 20; row++)
     {
-        <div class="map-row" data-row-index="@row">
+        <div class="map__row" data-row-index="@row">
             @for (int col = 1; col <= 20; col++)
             {
-                <div class="map-unit" data-row-index="@row" data-col-index="@col"></div>
+                <div class="map__unit" data-row-index="@row" data-col-index="@col"></div>
             }
         </div>
     }
@@ -38,14 +38,14 @@
 <script type="text/javascript">
 @foreach(var city in Model.Cities)
 {
-    @:$(".map-unit[data-row-index='@city.Y'][data-col-index='@city.X']").addClass('map-city');
+    @:$(".map__unit[data-row-index='@city.Y'][data-col-index='@city.X']").addClass('map__unit--city');
 }
 @foreach(var road in Model.Roads)
 {
-    @:$(".map-unit[data-row-index='@road.Y'][data-col-index='@road.X']").addClass('map-road-@road.Orientation');
+    @:$(".map__unit[data-row-index='@road.Y'][data-col-index='@road.X']").addClass('map__unit--road-@road.Orientation');
 }
 @foreach(var pass in Model.Passes)
 {
-    @:$(".map-unit[data-row-index='@pass.Y'][data-col-index='@pass.X']").addClass('map-pass');
+    @:$(".map__unit[data-row-index='@pass.Y'][data-col-index='@pass.X']").addClass('map__unit--pass');
 }
 </script>
