@@ -1,0 +1,33 @@
+@model asp_application1.Models.MapUnitViewModels.MapUnitIndexViewModel
+
+@{
+    ViewData["Title"] = "GraphicIndex";
+}
+
+<h2>Map</h2>
+
+<div class="map">
+    @for (int row = 1; row <= 20; row++)
+    {
+        <div class="map-row" data-row-index="@row">
+            @for(int col = 1; col <= 20; col++)
+            {
+                <div class="map-unit" data-row-index="@row" data-col-index="@col"></div>
+            }
+        </div>
+    }
+</div>
+<script type="text/javascript">
+@foreach(var city in Model.Cities)
+{
+    @:$(".map-unit[data-row-index='@city.Y'][data-col-index='@city.X']").addClass('map-city');
+}
+@foreach(var road in Model.Roads)
+{
+    @:$(".map-unit[data-row-index='@road.Y'][data-col-index='@road.X']").addClass('map-road-@road.Orientation');
+}
+@foreach(var pass in Model.Passes)
+{
+    @:$(".map-unit[data-row-index='@pass.Y'][data-col-index='@pass.X']").addClass('map-pass');
+}
+</script>

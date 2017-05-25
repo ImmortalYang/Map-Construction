@@ -1,0 +1,31 @@
+﻿.clearfix() {
+  display: block;
+  zoom: 1;
+
+  &::after {
+    content: " ";
+    display: block;
+    font-size: 0;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+}
+
+/*Set the parent position to non-static first
+    Otherwise this rule has no effects
+*/
+.center-position(){
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+/*Text border effect*/
+.text-border(@color; @width: 1px){
+    text-shadow: -@width 0 @color, 
+        @width 0 @color, 
+        0 @width @color, 
+        0 -@width @color;
+}

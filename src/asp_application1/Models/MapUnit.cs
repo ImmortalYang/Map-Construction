@@ -14,11 +14,11 @@ namespace asp_application1.Models
         public string ApplicationUserId { get; set; }
 
         [Required]
-        [Range(0, 100, ErrorMessage = "Please enter a number between 0 and 100.")]
+        [Range(1, 20, ErrorMessage = "Please enter a number between {1} and {2}.")]
         public int X { get; set; }
 
         [Required]
-        [Range(0, 100, ErrorMessage = "Please enter a number between 0 and 100.")]
+        [Range(1, 20, ErrorMessage = "Please enter a number between {1} and {2}.")]
         public int Y { get; set; }
 
         public Costs Cost { get; set; }

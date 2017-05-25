@@ -25,30 +25,22 @@ namespace asp_application1.Controllers
             _userManager = userManager;
         }
 
-        // GET: MapUnits
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-            var model = new MapUnitIndexViewModel()
-            {
-                Cities = await _context.Cities
-                    .Where(c => c.ApplicationUserId == user.Id)
-                    .AsNoTracking().ToListAsync(),
-                Roads = await _context.Roads
-                    .Where(r => r.ApplicationUserId == user.Id)
-                    .AsNoTracking().ToListAsync(),
-                Passes = await _context.Passes
-                    .Where(p => p.ApplicationUserId == user.Id)
-                    .AsNoTracking().ToListAsync()
-            };
-            return View("~/Views/MapUnits/Index.cshtml", model);
+            return View("~/Views/MapUnits/ListIndex.cshtml", 
+                await GetIndexViewModelAsync());
+        }
+
+        public async Task<IActionResult> GraphicIndex()
+        {
+            return View("~/Views/MapUnits/GraphicIndex.cshtml",
+                await GetIndexViewModelAsync());
         }
 
         public IActionResult Create()
         {
             return View();
         }
-
 
         public async Task<IActionResult> Details(int? id)
         {
@@ -147,6 +139,24 @@ namespace asp_application1.Controllers
         protected virtual Task<bool> TryUpdateMapUnitModelAsync(MapUnit model)
         {
             throw new NotImplementedException();
+        }
+
+        private async Task<MapUnitIndexViewModel> GetIndexViewModelAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var model = new MapUnitIndexViewModel()
+            {
+                Cities = await _context.Cities
+                    .Where(c => c.ApplicationUserId == user.Id)
+                    .AsNoTracking().ToListAsync(),
+                Roads = await _context.Roads
+                    .Where(r => r.ApplicationUserId == user.Id)
+                    .AsNoTracking().ToListAsync(),
+                Passes = await _context.Passes
+                    .Where(p => p.ApplicationUserId == user.Id)
+                    .AsNoTracking().ToListAsync()
+            };
+            return model;
         }
     }
 }
