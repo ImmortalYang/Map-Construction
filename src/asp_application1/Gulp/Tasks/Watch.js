@@ -14,7 +14,7 @@ gulp.task("watch", function () {
         gulp.start("cssInject");
     });
 
-    watch(["./wwwroot/js/**/*.js"], function () {
+    watch("./wwwroot/js/jsx/**/*.jsx", function () {
         gulp.start("scriptsRefresh");
     });
 });
