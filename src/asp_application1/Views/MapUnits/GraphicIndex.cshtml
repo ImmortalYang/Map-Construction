@@ -6,15 +6,16 @@
 
 <h2>Map</h2>
 
+<div id="map-root"></div>
 <div class="map">
     @for (int row = 1; row <= 20; row++)
     {
-        <div class="map__row" data-row-index="@row">
+        
             @for(int col = 1; col <= 20; col++)
             {
                 <div class="map__unit" data-row-index="@row" data-col-index="@col"></div>
             }
-        </div>
+        
     }
 </div>
 <script type="text/javascript">

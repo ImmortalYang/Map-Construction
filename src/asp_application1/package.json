@@ -17,7 +17,8 @@
     "del": "2.2.2"
   },
   "dependencies": {
-    "react": "^15.5.4", 
-    "react-dom": "^15.5.4"
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4", 
+    "jquery": "^3.2.1"
   }
 }

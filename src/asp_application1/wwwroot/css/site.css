@@ -46,13 +46,11 @@ textarea {
   background-size: cover;
   width: 1000px;
   height: 1000px;
-}
-.map__row {
-  height: 50px;
+  position: relative;
   display: block;
   zoom: 1;
 }
-.map__row::after {
+.map::after {
   content: " ";
   display: block;
   font-size: 0;

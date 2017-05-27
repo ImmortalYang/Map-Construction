@@ -1,9 +1,11 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
+import Map from './Components/Map';
 
-"use strict";
-
-ReactDOM.render(
-  <h1>Hello, world!</h1>,
-  document.getElementsByTagName('h2')[0]
-);
+var root = document.getElementById('map-root');
+if(root !== null){
+    ReactDOM.render(
+      <Map url='/MapUnits/GetIndexViewModelJsonAsync' />, 
+      document.getElementById('map-root')
+    );
+}

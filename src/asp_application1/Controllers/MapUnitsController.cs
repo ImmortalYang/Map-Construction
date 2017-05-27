@@ -170,5 +170,10 @@ namespace asp_application1.Controllers
             };
             return model;
         }
+
+        public async Task<JsonResult> GetIndexViewModelJsonAsync()
+        {
+            return Json(await GetIndexViewModelAsync());
+        }
     }
 }
