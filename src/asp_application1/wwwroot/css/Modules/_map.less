@@ -8,9 +8,21 @@
 
     &__unit {
         float: left;
+        position: relative;
         width: @map-unit-width;
         height: @map-unit-height;
         background-size: contain;
+
+        &__float-tag{
+            color: firebrick;
+            font-weight: 900;
+            font-size: xx-small;
+            position: absolute;
+            bottom: 0;
+            z-index: 5;
+            left: 50%;
+            transform: translateX(-50%);
+        }
 
         &--city {
             background: url('../../images/map/city.jpg');           

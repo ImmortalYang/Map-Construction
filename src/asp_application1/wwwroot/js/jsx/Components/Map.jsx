@@ -6,8 +6,7 @@ class Map extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            units: [], 
-            data: {}
+            units: []
         };
         for(var row = 0; row < 20; row++){
             this.state.units[row] = [];
@@ -22,24 +21,18 @@ class Map extends React.Component{
                 });
             }
         }
+        $.get(this.props.url, data => this.loadUnitsFromData(data));
     }
 
     render(){
-        var mapUnits = this.state.units.map(row => row.map(item => <MapUnit unitType={item.unitType} unit={item.unit} />));
+        var mapUnits = this.state.units.map(row => 
+                    row.map(item => 
+                    <MapUnit unitType={item.unitType} unit={item.unit} position={item.position} />)
+                );
         return <div className='map'>
                     {mapUnits}
                </div>
     }
-
-    componentDidMount(){
-        this.loadDataFromServer();
-    }
-
-    loadDataFromServer(){
-        $.get(this.props.url, data => this.loadUnitsFromData(data));
-    }
-
-
 
     loadUnitsFromData(dataModel){
         $.each(dataModel.cities, (index, city) => {
@@ -60,7 +53,9 @@ class Map extends React.Component{
                 unit: road
             };  
         });
-        this.forceUpdate();
+        this.setState({
+            units: this.state.units
+        });
     }
 
 }

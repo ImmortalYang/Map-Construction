@@ -15,6 +15,13 @@ namespace asp_application1.Controllers
     [Authorize(Roles = ("Admin,Member"))]
     public class RoadsController : MapUnitsController
     {
+        protected override Costs _unitCost
+        {
+            get
+            {
+                return Costs.Road;
+            }
+        }
         public RoadsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
         }
@@ -23,28 +30,20 @@ namespace asp_application1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Orientation,X,Y")] Road road)
-        {  
-            if (ModelState.IsValid)
+        {
+            if (await TryCreateUnit(road))
             {
-                var user = await _userManager.GetUserAsync(User);
-                road.Cost = Costs.Road;
-                road.ApplicationUserId = user.Id;
-                if (await road.UnitLocationOccupied(_context, user))
-                {
-                    ModelState.AddModelError("", "The location is occupied by another unit.");
-                    return View(road);
-                }
-                if (user.Balance < (int)road.Cost)
-                {
-                    ModelState.AddModelError("", "You have insufficient balance to build this unit.");
-                    return View(road);
-                }
-                user.Balance -= (int)road.Cost;
-                _context.Add(road);
-                await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            return View(road);
+            else
+            {
+                return View(road);
+            }
+        }
+
+        public async Task<JsonResult> CreateFromGraph([Bind("Orientation,X,Y")] Road road)
+        {
+            return await TryCreateUnitFromGraph(road);
         }
 
         protected override async Task<MapUnit> GetUnitByIdAsync(int? id)

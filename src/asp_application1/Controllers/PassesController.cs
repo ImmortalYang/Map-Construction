@@ -15,6 +15,14 @@ namespace asp_application1.Controllers
     [Authorize(Roles = ("Admin,Member"))]
     public class PassesController : MapUnitsController
     {
+        protected override Costs _unitCost
+        {
+            get
+            {
+                return Costs.Pass;
+            }
+        }
+
         public PassesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
         }
@@ -24,28 +32,19 @@ namespace asp_application1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Duration,X,Y")] Pass pass)
         {
-            if (ModelState.IsValid)
+            if (await TryCreateUnit(pass))
             {
-                var user = await _userManager.GetUserAsync(User);
-                pass.Cost = Costs.Pass;
-                pass.ApplicationUserId = user.Id;
-                if (await pass.UnitLocationOccupied(_context, user))
-                {
-                    ModelState.AddModelError("", "The location is occupied by another unit.");
-                    return View(pass);
-                }
-                if (user.Balance < (int)pass.Cost)
-                {
-                    ModelState.AddModelError("", "You have insufficient balance to build this unit.");
-                    return View(pass);
-                }
-                user.Balance -= (int)pass.Cost;
-                _context.Add(pass);
-                await _context.SaveChangesAsync();
-
                 return RedirectToAction("Index");
             }
-            return View(pass);
+            else
+            {
+                return View(pass);
+            }
+        }
+
+        public async Task<JsonResult> CreateFromGraph([Bind("Duration,X,Y")] Pass pass)
+        {
+            return await TryCreateUnitFromGraph(pass);
         }
 
         protected override async Task<MapUnit> GetUnitByIdAsync(int? id)

@@ -9,12 +9,21 @@ using asp_application1.Data;
 using asp_application1.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace asp_application1.Controllers
 {
     [Authorize(Roles = ("Admin,Member"))]
     public class CitiesController : MapUnitsController
     {
+        protected override Costs _unitCost
+        {
+            get
+            {
+                return Costs.City;
+            }
+        }
+
         public CitiesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
         }
@@ -23,29 +32,20 @@ namespace asp_application1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,X,Y")] City city)
-        { 
-            if (ModelState.IsValid)
+        {
+            if (await TryCreateUnit(city))
             {
-                var user = await _userManager.GetUserAsync(User);
-                city.Cost = Costs.City;
-                city.ApplicationUserId = user.Id;
-                if(await city.UnitLocationOccupied(_context, user))
-                {
-                    ModelState.AddModelError("", "The location is occupied by another unit.");
-                    return View(city);
-                }
-                if(user.Balance < (int)city.Cost)
-                {
-                    ModelState.AddModelError("", "You have insufficient balance to build this unit.");
-                    return View(city);
-                }
-                user.Balance -= (int)city.Cost;
-                _context.Add(city);
-                await _context.SaveChangesAsync();
-                
                 return RedirectToAction("Index");
             }
-            return View(city);
+            else
+            {
+                return View(city);
+            }
+        }
+
+        public async Task<JsonResult> CreateFromGraph([Bind("Name,X,Y")] City city)
+        {
+            return await TryCreateUnitFromGraph(city);
         }
 
         protected override async Task<MapUnit> GetUnitByIdAsync(int? id)

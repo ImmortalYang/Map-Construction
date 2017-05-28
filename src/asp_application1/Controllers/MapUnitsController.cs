@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using asp_application1.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace asp_application1.Controllers
 {
@@ -17,6 +18,7 @@ namespace asp_application1.Controllers
     {
         protected readonly ApplicationDbContext _context;
         protected UserManager<ApplicationUser> _userManager;
+        protected virtual Costs _unitCost { get; }
 
         public MapUnitsController(ApplicationDbContext context, 
             UserManager<ApplicationUser> userManager)
@@ -46,6 +48,55 @@ namespace asp_application1.Controllers
         public IActionResult Create()
         {
             return View();
+        }
+
+        public async Task<bool> TryCreateUnit(MapUnit unit)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                unit.Cost = _unitCost;
+                unit.ApplicationUserId = user.Id;
+                if (await unit.UnitLocationOccupied(_context, user))
+                {
+                    ModelState.AddModelError("", "The location is occupied by another unit.");
+                    return false;
+                }
+                if (user.Balance < (int)unit.Cost)
+                {
+                    ModelState.AddModelError("", "You have insufficient balance to build this unit.");
+                    return false;
+                }
+                user.Balance -= (int)unit.Cost;
+                try
+                {
+                    _context.Add(unit);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    ModelState.AddModelError("", "Unable to save changes, please try again.");
+                    return false;
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<JsonResult> TryCreateUnitFromGraph(MapUnit unit)
+        {
+            if (await TryCreateUnit(unit))
+            {
+                return Json("success");
+            }
+            else
+            {
+                return Json(ModelState.Values
+                            .Where(entry => entry.Errors.Count > 0)
+                            .SelectMany(entry => entry.Errors)
+                            .Select(error => error.ErrorMessage));
+            }
         }
 
         public async Task<IActionResult> Details(int? id)

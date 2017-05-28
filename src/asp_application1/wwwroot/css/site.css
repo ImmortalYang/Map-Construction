@@ -60,9 +60,20 @@ textarea {
 }
 .map__unit {
   float: left;
+  position: relative;
   width: 50px;
   height: 50px;
   background-size: contain;
+}
+.map__unit__float-tag {
+  color: firebrick;
+  font-weight: 900;
+  font-size: xx-small;
+  position: absolute;
+  bottom: 0;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .map__unit--city {
   background: url('../../images/map/city.jpg');
@@ -90,4 +101,8 @@ textarea {
 }
 .map__unit--road-All {
   background: url('../../images/map/road-all.jpg');
+}
+.form-popup {
+  position: absolute;
+  z-index: 10;
 }
