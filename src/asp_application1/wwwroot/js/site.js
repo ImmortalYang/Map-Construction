@@ -9989,7 +9989,8 @@ var MapUnit = function (_React$Component) {
 
         _this.state = {
             forms: [],
-            showForm: true
+            showForm: true,
+            hover: false
         };
         return _this;
     }
@@ -10050,13 +10051,26 @@ var MapUnit = function (_React$Component) {
                     },
                     onContextMenu: function onContextMenu(e) {
                         return _this2.contextMenu(e);
+                    },
+                    onMouseEnter: function onMouseEnter(e) {
+                        return _this2.mouseEnterHandler(e);
+                    },
+                    onMouseLeave: function onMouseLeave(e) {
+                        return _this2.mouseLeaveHandler(e);
                     } },
                 _react2.default.createElement(
-                    'span',
+                    'div',
                     { className: 'map__unit__float-tag' },
                     floating_tag
                 ),
-                this.state.showForm && this.state.forms
+                this.state.showForm && this.state.forms,
+                this.state.hover && this.state.unitType !== '' && _react2.default.createElement(
+                    'div',
+                    { className: 'form-popup form-popup--delete', onClick: function onClick(e) {
+                            return _this2.onDelete(e);
+                        } },
+                    'X'
+                )
             );
         }
     }, {
@@ -10084,6 +10098,16 @@ var MapUnit = function (_React$Component) {
             }
         }
     }, {
+        key: 'mouseEnterHandler',
+        value: function mouseEnterHandler(e) {
+            this.setState({ hover: true });
+        }
+    }, {
+        key: 'mouseLeaveHandler',
+        value: function mouseLeaveHandler(e) {
+            this.setState({ hover: false });
+        }
+    }, {
         key: 'cancelHandler',
         value: function cancelHandler() {
             this.setState({
@@ -10100,9 +10124,9 @@ var MapUnit = function (_React$Component) {
                     _this4.setState({
                         unitType: 'city',
                         unit: city,
-                        showForm: false
+                        showForm: false,
+                        hover: false
                     });
-                    alert('You have added a city ' + city.name + ' at (' + city.X + ', ' + city.Y + ') successfully.');
                 } else {
                     alert(data);
                 }
@@ -10118,9 +10142,9 @@ var MapUnit = function (_React$Component) {
                     _this5.setState({
                         unitType: 'road',
                         unit: road,
-                        showForm: false
+                        showForm: false,
+                        hover: false
                     });
-                    alert('You have added a road at (' + road.X + ', ' + road.Y + ') successfully.');
                 } else {
                     alert(data);
                 }
@@ -10136,9 +10160,38 @@ var MapUnit = function (_React$Component) {
                     _this6.setState({
                         unitType: 'pass',
                         unit: pass,
-                        showForm: false
+                        showForm: false,
+                        hover: false
                     });
-                    alert('You have added a pass at (' + pass.X + ', ' + pass.Y + ') successfully.');
+                } else {
+                    alert(data);
+                }
+            });
+        }
+    }, {
+        key: 'onDelete',
+        value: function onDelete(e) {
+            var _this7 = this;
+
+            e.stopPropagation();
+            var controllerSlug;
+            switch (this.state.unitType) {
+                case 'city':
+                    controllerSlug = 'Cities';break;
+                case 'road':
+                    controllerSlug = 'Roads';break;
+                case 'pass':
+                    controllerSlug = 'Passes';break;
+            }
+
+            $.get('/' + controllerSlug + '/DeleteFromGraph', { x: this.state.unit.x, y: this.state.unit.y }, function (data) {
+                if (data === 'success') {
+                    _this7.setState({
+                        unitType: '',
+                        unit: {},
+                        showForm: false,
+                        hover: false
+                    });
                 } else {
                     alert(data);
                 }

@@ -6,7 +6,8 @@ class MapUnit extends React.Component{
         super(props);
         this.state = {
             forms: [], 
-            showForm: true
+            showForm: true, 
+            hover: false
         };
     }
 
@@ -47,9 +48,12 @@ class MapUnit extends React.Component{
                            </div>
         }
         return <div className={className} onClick={e => this.clickHandler(e)} 
-                    onContextMenu={e => this.contextMenu(e)} >
-                    <span className='map__unit__float-tag'>{floating_tag}</span>
+                    onContextMenu={e => this.contextMenu(e)} 
+                    onMouseEnter={e => this.mouseEnterHandler(e)} 
+                    onMouseLeave={e => this.mouseLeaveHandler(e)} >
+                    <div className='map__unit__float-tag'>{floating_tag}</div>
                     {this.state.showForm && this.state.forms}
+                    {this.state.hover && this.state.unitType !== '' && <div className='form-popup form-popup--delete' onClick={e => this.onDelete(e)}>X</div>}
                </div>
     }
 
@@ -66,6 +70,14 @@ class MapUnit extends React.Component{
         }
     }
 
+    mouseEnterHandler(e){
+        this.setState({ hover: true });
+    }
+
+    mouseLeaveHandler(e){
+        this.setState({ hover: false });
+    }
+
     cancelHandler(){
         this.setState({
             showForm: false
@@ -78,9 +90,9 @@ class MapUnit extends React.Component{
                 this.setState({
                     unitType: 'city', 
                     unit: city, 
-                    showForm: false
+                    showForm: false, 
+                    hover: false
                 });
-                alert('You have added a city ' + city.name + ' at (' + city.X + ', ' + city.Y + ') successfully.');
             }
             else{
                 alert(data);
@@ -94,9 +106,9 @@ class MapUnit extends React.Component{
                 this.setState({
                     unitType: 'road', 
                     unit: road, 
-                    showForm: false
+                    showForm: false, 
+                    hover: false
                 });
-                alert('You have added a road at (' + road.X + ', ' + road.Y + ') successfully.');
             }
             else{
                 alert(data);
@@ -110,9 +122,33 @@ class MapUnit extends React.Component{
                 this.setState({
                     unitType: 'pass', 
                     unit: pass, 
-                    showForm: false
+                    showForm: false, 
+                    hover: false
                 });
-                alert('You have added a pass at (' + pass.X + ', ' + pass.Y + ') successfully.');
+            }
+            else{
+                alert(data);
+            }
+        });
+    }
+
+    onDelete(e){
+        e.stopPropagation();
+        var controllerSlug;
+        switch(this.state.unitType){
+            case 'city': controllerSlug = 'Cities'; break;
+            case 'road': controllerSlug = 'Roads'; break;
+            case 'pass': controllerSlug = 'Passes'; break;
+        }
+
+        $.get('/' + controllerSlug + '/DeleteFromGraph', {x: this.state.unit.x, y: this.state.unit.y} ,(data) => {
+            if(data === 'success'){
+                this.setState({
+                    unitType: '', 
+                    unit: {}, 
+                    showForm: false, 
+                    hover: false
+                });
             }
             else{
                 alert(data);

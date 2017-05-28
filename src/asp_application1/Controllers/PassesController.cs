@@ -52,6 +52,11 @@ namespace asp_application1.Controllers
             return await _context.Passes.SingleOrDefaultAsync(p => p.ID == id);
         }
 
+        protected override async Task<MapUnit> GetUnitByPositionAsync(int x, int y)
+        {
+            return await _context.Passes.SingleOrDefaultAsync(c => c.X == x && c.Y == y);
+        }
+
         protected override async Task<bool> TryUpdateMapUnitModelAsync(MapUnit model)
         {
             if (!(model is Pass)) return false;

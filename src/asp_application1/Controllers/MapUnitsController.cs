@@ -188,6 +188,30 @@ namespace asp_application1.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<JsonResult> DeleteFromGraph(int x, int y)
+        {
+            var unitToDelete = await GetUnitByPositionAsync(x, y);
+            if (unitToDelete == null)
+            {
+                return Json("unit not found.");
+            }
+            try
+            {
+                _context.Remove(unitToDelete);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return Json("Data update failed. Please try again.");
+            }
+            return Json("success");
+        }
+
+        protected virtual Task<MapUnit> GetUnitByPositionAsync(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
+
         protected virtual Task<MapUnit> GetUnitByIdAsync(int? id)
         {
             throw new NotImplementedException();
