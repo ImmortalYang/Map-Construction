@@ -15,8 +15,8 @@ class Map extends React.Component{
                     unitType: '', 
                     unit: {}, 
                     position: {
-                        x: col, 
-                        y: row
+                        x: col+1, 
+                        y: row+1
                     }
                 });
             }
@@ -38,19 +38,31 @@ class Map extends React.Component{
         $.each(dataModel.cities, (index, city) => {
             this.state.units[city.y-1][city.x-1] = {
                 unitType: 'city', 
-                unit: city
+                unit: city, 
+                position: {
+                    x: city.x, 
+                    y: city.y
+                }
             };    
         });
         $.each(dataModel.passes, (index, pass) => {
             this.state.units[pass.y-1][pass.x-1] = {
                 unitType: 'pass', 
-                unit: pass
+                unit: pass, 
+                position: {
+                    x: pass.x, 
+                    y: pass.y
+                }
             };  
         });
         $.each(dataModel.roads, (index, road) => {
             this.state.units[road.y-1][road.x-1] = {
                 unitType: 'road', 
-                unit: road
+                unit: road, 
+                position: {
+                    x: road.x, 
+                    y: road.y
+                }
             };  
         });
         this.setState({

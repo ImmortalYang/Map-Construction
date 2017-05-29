@@ -66,14 +66,21 @@ textarea {
   background-size: contain;
 }
 .map__unit__float-tag {
+  position: absolute;
+  z-index: 5;
+}
+.map__unit__float-tag--attr {
   color: firebrick;
   font-weight: 900;
   font-size: xx-small;
-  position: absolute;
   bottom: 0;
-  z-index: 5;
   left: 50%;
   transform: translateX(-50%);
+}
+.map__unit__float-tag--del {
+  right: 0;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0);
 }
 .map__unit--city {
   background: url('../../images/map/city.jpg');
@@ -106,9 +113,15 @@ textarea {
   position: absolute;
   z-index: 10;
   background-color: #eee;
+  padding: 10px;
+  width: 200px;
 }
-.form-popup--delete {
-  right: 0;
+.form-popup__background {
+  position: absolute;
+  z-index: 9;
   top: 0;
-  background-color: rgba(255, 255, 255, 0);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.7);
 }

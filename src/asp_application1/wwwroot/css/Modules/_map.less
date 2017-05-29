@@ -13,15 +13,23 @@
         height: @map-unit-height;
         background-size: contain;
 
+        //floating tag, e.g. attribute bar, delete button
         &__float-tag{
-            color: firebrick;
-            font-weight: 900;
-            font-size: xx-small;
             position: absolute;
-            bottom: 0;
             z-index: 5;
-            left: 50%;
-            transform: translateX(-50%);
+            &--attr{
+                color: firebrick;
+                font-weight: 900;
+                font-size: xx-small;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            &--del{
+                right: 0;
+                top: 0;
+                background-color: rgba(255,255,255,0);
+            }
         }
 
         &--city {
