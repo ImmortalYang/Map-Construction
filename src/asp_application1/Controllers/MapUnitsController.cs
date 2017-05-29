@@ -162,6 +162,26 @@ namespace asp_application1.Controllers
             return View(unitToUpdate);
         }
 
+        public async Task<JsonResult> EditMove(int fromX, int fromY, int toX, int toY)
+        {
+            var unit = await GetUnitByPositionAsync(fromX, fromY);
+            if(unit == null)
+            {
+                return Json("unit not found.");
+            }
+            unit.X = toX;
+            unit.Y = toY;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return Json("Cannot update data. Please try again.");
+            }
+            return Json("success");
+        }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

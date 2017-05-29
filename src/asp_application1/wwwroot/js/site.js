@@ -9661,8 +9661,8 @@ var Map = function (_React$Component) {
                     unitType: '',
                     unit: {},
                     position: {
-                        x: col,
-                        y: row
+                        x: col + 1,
+                        y: row + 1
                     }
                 });
             }
@@ -9695,19 +9695,31 @@ var Map = function (_React$Component) {
             _jquery2.default.each(dataModel.cities, function (index, city) {
                 _this2.state.units[city.y - 1][city.x - 1] = {
                     unitType: 'city',
-                    unit: city
+                    unit: city,
+                    position: {
+                        x: city.x,
+                        y: city.y
+                    }
                 };
             });
             _jquery2.default.each(dataModel.passes, function (index, pass) {
                 _this2.state.units[pass.y - 1][pass.x - 1] = {
                     unitType: 'pass',
-                    unit: pass
+                    unit: pass,
+                    position: {
+                        x: pass.x,
+                        y: pass.y
+                    }
                 };
             });
             _jquery2.default.each(dataModel.roads, function (index, road) {
                 _this2.state.units[road.y - 1][road.x - 1] = {
                     unitType: 'road',
-                    unit: road
+                    unit: road,
+                    position: {
+                        x: road.x,
+                        y: road.y
+                    }
                 };
             });
             this.setState({
@@ -9916,8 +9928,8 @@ var AddForm = function (_React$Component) {
             e.stopPropagation();
             e.preventDefault();
             this.props.onCitySubmit({
-                X: this.props.position.x + 1,
-                Y: this.props.position.y + 1,
+                x: this.props.position.x,
+                y: this.props.position.y,
                 name: this.state.name
             });
         }
@@ -9927,8 +9939,8 @@ var AddForm = function (_React$Component) {
             e.stopPropagation();
             e.preventDefault();
             this.props.onRoadSubmit({
-                X: this.props.position.x + 1,
-                Y: this.props.position.y + 1,
+                x: this.props.position.x,
+                y: this.props.position.y,
                 orientation: this.state.orientation
             });
         }
@@ -9938,8 +9950,8 @@ var AddForm = function (_React$Component) {
             e.stopPropagation();
             e.preventDefault();
             this.props.onPassSubmit({
-                X: this.props.position.x + 1,
-                Y: this.props.position.y + 1,
+                x: this.props.position.x,
+                y: this.props.position.y,
                 duration: this.state.duration
             });
         }
@@ -10049,14 +10061,24 @@ var MapUnit = function (_React$Component) {
                 { className: className, onClick: function onClick(e) {
                         return _this2.clickHandler(e);
                     },
-                    onContextMenu: function onContextMenu(e) {
-                        return _this2.contextMenu(e);
-                    },
                     onMouseEnter: function onMouseEnter(e) {
                         return _this2.mouseEnterHandler(e);
                     },
                     onMouseLeave: function onMouseLeave(e) {
                         return _this2.mouseLeaveHandler(e);
+                    },
+                    draggable: this.state.unitType !== '',
+                    onDragStart: function onDragStart(e) {
+                        return _this2.dragStartHandler(e);
+                    },
+                    onDragOver: function onDragOver(e) {
+                        return _this2.dragOverHandler(e);
+                    },
+                    onDrop: function onDrop(e) {
+                        return _this2.dropHandler(e);
+                    },
+                    onDragEnd: function onDragEnd(e) {
+                        return _this2.dragEndHandler(e);
                     } },
                 _react2.default.createElement(
                     'div',
@@ -10082,7 +10104,7 @@ var MapUnit = function (_React$Component) {
                 this.setState({
                     forms: [_react2.default.createElement(_AddForm2.default, { key: 0, position: this.props.position,
                         onCancelAdd: function onCancelAdd() {
-                            return _this3.cancelHandler();
+                            return _this3.onCancel();
                         },
                         onCitySubmit: function onCitySubmit(city) {
                             return _this3.onAddCity(city);
@@ -10108,8 +10130,68 @@ var MapUnit = function (_React$Component) {
             this.setState({ hover: false });
         }
     }, {
-        key: 'cancelHandler',
-        value: function cancelHandler() {
+        key: 'dragStartHandler',
+        value: function dragStartHandler(e) {
+            e.dataTransfer.setData('unit', JSON.stringify(this.state.unit));
+            e.dataTransfer.setData('unitType', this.state.unitType);
+        }
+    }, {
+        key: 'dragOverHandler',
+        value: function dragOverHandler(e) {
+            if (this.state.unitType === '') {
+                e.preventDefault();
+            }
+        }
+    }, {
+        key: 'dropHandler',
+        value: function dropHandler(e) {
+            var _this4 = this;
+
+            e.preventDefault();
+            var fromUnit = JSON.parse(e.dataTransfer.getData('unit'));
+            var fromUnitType = e.dataTransfer.getData('unitType');
+            var controllerSlug;
+            switch (fromUnitType) {
+                case 'city':
+                    controllerSlug = 'Cities';break;
+                case 'road':
+                    controllerSlug = 'Roads';break;
+                case 'pass':
+                    controllerSlug = 'Passes';break;
+            }
+            $.get('/' + controllerSlug + '/EditMove', { fromX: fromUnit.x,
+                fromY: fromUnit.y,
+                toX: this.props.position.x,
+                toY: this.props.position.y }, function (data) {
+                if (data === 'success') {
+                    fromUnit.x = _this4.props.position.x;
+                    fromUnit.y = _this4.props.position.y;
+                    _this4.setState({
+                        unitType: fromUnitType,
+                        unit: fromUnit,
+                        showForm: false,
+                        hover: false
+                    });
+                } else {
+                    alert(data);
+                }
+            }).promise(); //end $.get  
+        }
+    }, {
+        key: 'dragEndHandler',
+        value: function dragEndHandler(e) {
+            if (e.dataTransfer.dropEffect !== 'none') {
+                this.setState({
+                    unitType: '',
+                    unit: {},
+                    showForm: false,
+                    hover: false
+                });
+            }
+        }
+    }, {
+        key: 'onCancel',
+        value: function onCancel() {
             this.setState({
                 showForm: false
             });
@@ -10117,11 +10199,11 @@ var MapUnit = function (_React$Component) {
     }, {
         key: 'onAddCity',
         value: function onAddCity(city) {
-            var _this4 = this;
+            var _this5 = this;
 
             $.get('/Cities/CreateFromGraph', city, function (data) {
                 if (data === 'success') {
-                    _this4.setState({
+                    _this5.setState({
                         unitType: 'city',
                         unit: city,
                         showForm: false,
@@ -10135,11 +10217,11 @@ var MapUnit = function (_React$Component) {
     }, {
         key: 'onAddRoad',
         value: function onAddRoad(road) {
-            var _this5 = this;
+            var _this6 = this;
 
             $.get('/Roads/CreateFromGraph', road, function (data) {
                 if (data === 'success') {
-                    _this5.setState({
+                    _this6.setState({
                         unitType: 'road',
                         unit: road,
                         showForm: false,
@@ -10153,11 +10235,11 @@ var MapUnit = function (_React$Component) {
     }, {
         key: 'onAddPass',
         value: function onAddPass(pass) {
-            var _this6 = this;
+            var _this7 = this;
 
             $.get('/Passes/CreateFromGraph', pass, function (data) {
                 if (data === 'success') {
-                    _this6.setState({
+                    _this7.setState({
                         unitType: 'pass',
                         unit: pass,
                         showForm: false,
@@ -10171,7 +10253,7 @@ var MapUnit = function (_React$Component) {
     }, {
         key: 'onDelete',
         value: function onDelete(e) {
-            var _this7 = this;
+            var _this8 = this;
 
             e.stopPropagation();
             var controllerSlug;
@@ -10184,9 +10266,9 @@ var MapUnit = function (_React$Component) {
                     controllerSlug = 'Passes';break;
             }
 
-            $.get('/' + controllerSlug + '/DeleteFromGraph', { x: this.state.unit.x, y: this.state.unit.y }, function (data) {
+            $.get('/' + controllerSlug + '/DeleteFromGraph', { x: this.props.position.x, y: this.props.position.y }, function (data) {
                 if (data === 'success') {
-                    _this7.setState({
+                    _this8.setState({
                         unitType: '',
                         unit: {},
                         showForm: false,
@@ -10196,11 +10278,6 @@ var MapUnit = function (_React$Component) {
                     alert(data);
                 }
             });
-        }
-    }, {
-        key: 'contextMenu',
-        value: function contextMenu(e) {
-            e.preventDefault();
         }
     }]);
 

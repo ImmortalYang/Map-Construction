@@ -47,10 +47,14 @@ class MapUnit extends React.Component{
                                 <div style={styleCurrentDuration}></div>
                            </div>
         }
-        return <div className={className} onClick={e => this.clickHandler(e)} 
-                    onContextMenu={e => this.contextMenu(e)} 
+        return <div className={className} onClick={e => this.clickHandler(e)}  
                     onMouseEnter={e => this.mouseEnterHandler(e)} 
-                    onMouseLeave={e => this.mouseLeaveHandler(e)} >
+                    onMouseLeave={e => this.mouseLeaveHandler(e)} 
+                    draggable={this.state.unitType !== ''} 
+                    onDragStart={e => this.dragStartHandler(e)} 
+                    onDragOver={e => this.dragOverHandler(e)} 
+                    onDrop={e => this.dropHandler(e)} 
+                    onDragEnd={e => this.dragEndHandler(e)} >
                     <div className='map__unit__float-tag'>{floating_tag}</div>
                     {this.state.showForm && this.state.forms}
                     {this.state.hover && this.state.unitType !== '' && <div className='form-popup form-popup--delete' onClick={e => this.onDelete(e)}>X</div>}
@@ -61,7 +65,7 @@ class MapUnit extends React.Component{
         if(this.state.unitType === '' && this.state.forms != null){
             this.setState({
                 forms: [<AddForm key={0} position={this.props.position} 
-                    onCancelAdd={() => this.cancelHandler()} 
+                    onCancelAdd={() => this.onCancel()} 
                     onCitySubmit={(city) => this.onAddCity(city)} 
                     onRoadSubmit={(road) => this.onAddRoad(road)} 
                     onPassSubmit={(pass) => this.onAddPass(pass)} />], 
@@ -78,7 +82,62 @@ class MapUnit extends React.Component{
         this.setState({ hover: false });
     }
 
-    cancelHandler(){
+    dragStartHandler(e){
+        e.dataTransfer.setData('unit', JSON.stringify(this.state.unit));
+        e.dataTransfer.setData('unitType', this.state.unitType);
+    }
+
+    dragOverHandler(e){
+        if(this.state.unitType === ''){
+            e.preventDefault();
+        }
+    }
+
+    dropHandler(e){
+        e.preventDefault();
+        var fromUnit = JSON.parse(e.dataTransfer.getData('unit'));
+        const fromUnitType = e.dataTransfer.getData('unitType');
+        var controllerSlug;
+        switch(fromUnitType){
+            case 'city': controllerSlug = 'Cities'; break;
+            case 'road': controllerSlug = 'Roads'; break;
+            case 'pass': controllerSlug = 'Passes'; break;
+        }
+        $.get('/' + controllerSlug + '/EditMove', 
+                {fromX: fromUnit.x, 
+                 fromY: fromUnit.y, 
+                 toX: this.props.position.x, 
+                 toY: this.props.position.y} ,
+                (data) => {
+                    if(data === 'success')  {
+                        fromUnit.x = this.props.position.x;
+                        fromUnit.y = this.props.position.y;
+                        this.setState({
+                            unitType: fromUnitType, 
+                            unit: fromUnit, 
+                            showForm: false, 
+                            hover: false
+                        });
+                    }
+                    else{
+                        alert(data);
+                    }
+                }
+        ).promise();//end $.get  
+    }
+
+    dragEndHandler(e){
+        if(e.dataTransfer.dropEffect !== 'none'){
+            this.setState({
+                unitType: '', 
+                unit: {}, 
+                showForm: false, 
+                hover: false
+            });
+        }
+    }
+
+    onCancel(){
         this.setState({
             showForm: false
         });
@@ -141,7 +200,7 @@ class MapUnit extends React.Component{
             case 'pass': controllerSlug = 'Passes'; break;
         }
 
-        $.get('/' + controllerSlug + '/DeleteFromGraph', {x: this.state.unit.x, y: this.state.unit.y} ,(data) => {
+        $.get('/' + controllerSlug + '/DeleteFromGraph', {x: this.props.position.x, y: this.props.position.y} ,(data) => {
             if(data === 'success'){
                 this.setState({
                     unitType: '', 
@@ -156,10 +215,6 @@ class MapUnit extends React.Component{
         });
     }
 
-    contextMenu(e){
-        e.preventDefault();
-        
-    }
 }
 
 export default MapUnit;

@@ -75,8 +75,8 @@ class AddForm extends React.Component{
         e.stopPropagation();
         e.preventDefault();
         this.props.onCitySubmit({
-            X: this.props.position.x+1, 
-            Y: this.props.position.y+1, 
+            x: this.props.position.x, 
+            y: this.props.position.y, 
             name: this.state.name
         });
     }
@@ -85,8 +85,8 @@ class AddForm extends React.Component{
         e.stopPropagation();
         e.preventDefault();
         this.props.onRoadSubmit({
-            X: this.props.position.x+1, 
-            Y: this.props.position.y+1, 
+            x: this.props.position.x, 
+            y: this.props.position.y, 
             orientation: this.state.orientation
         });
     }
@@ -95,8 +95,8 @@ class AddForm extends React.Component{
         e.stopPropagation();
         e.preventDefault();
         this.props.onPassSubmit({
-            X: this.props.position.x+1, 
-            Y: this.props.position.y+1, 
+            x: this.props.position.x, 
+            y: this.props.position.y, 
             duration: this.state.duration
         });
     }
