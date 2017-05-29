@@ -55,17 +55,18 @@ class MapUnit extends React.Component{
                     onDragOver={e => this.dragOverHandler(e)} 
                     onDrop={e => this.dropHandler(e)} 
                     onDragEnd={e => this.dragEndHandler(e)} >
-                    <div className='map__unit__float-tag'>{floating_tag}</div>
+                    <div className='map__unit__float-tag map__unit__float-tag--attr'>{floating_tag}</div>
                     {this.state.showForm && this.state.forms}
-                    {this.state.hover && this.state.unitType !== '' && <div className='form-popup form-popup--delete' onClick={e => this.onDelete(e)}>X</div>}
+                    {this.state.hover && this.state.unitType !== '' && <div className='map__unit__float-tag map__unit__float-tag--del' onClick={e => this.onDelete(e)}>X</div>}
                </div>
+               {this.state.showForm && <div className='form-popup__background' onClick={e => this.onExitForm(e)} ></div>}
     }
 
     clickHandler(e){
         if(this.state.unitType === '' && this.state.forms != null){
             this.setState({
                 forms: [<AddForm key={0} position={this.props.position} 
-                    onCancelAdd={() => this.onCancel()} 
+                    onExit={(e) => this.onExitForm(e)} 
                     onCitySubmit={(city) => this.onAddCity(city)} 
                     onRoadSubmit={(road) => this.onAddRoad(road)} 
                     onPassSubmit={(pass) => this.onAddPass(pass)} />], 
@@ -120,6 +121,7 @@ class MapUnit extends React.Component{
                         });
                     }
                     else{
+                        e.dataTransfer.dropEffect = 'none';
                         alert(data);
                     }
                 }
@@ -137,7 +139,8 @@ class MapUnit extends React.Component{
         }
     }
 
-    onCancel(){
+    onExitForm(e){
+        e.stopPropagation();
         this.setState({
             showForm: false
         });

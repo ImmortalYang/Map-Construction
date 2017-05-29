@@ -12,15 +12,17 @@ class AddForm extends React.Component{
 
     render(){
         return (<div className='form-popup'>
-                    <form className='form-inline' onSubmit={e => this.handleCitySubmit(e)}>
+                    <form className='form' onSubmit={e => this.handleCitySubmit(e)}>
                         <div className='form-group'>
                             <label htmlFor='Name'>Name: </label>
                             <input className='form-control' type='text' name='Name' 
                                     onChange={e => this.handleNameChange(e)} />
                         </div> 
-                        <input className='form-control' type='submit' value='Add City' />
+                        <div className='form-group'>
+                            <input className='form-control' type='submit' value='Add City' />
+                        </div>
                     </form>
-                    <form className='form-inline' onSubmit={e => this.handleRoadSubmit(e)}>
+                    <form className='form' onSubmit={e => this.handleRoadSubmit(e)}>
                         <div className='form-group'>
                             <label htmlFor='Orientation'>Orientation: </label>
                             <select className='form-control' name='Orientation' 
@@ -34,23 +36,26 @@ class AddForm extends React.Component{
                                 <option value='6'>All</option>
                             </select>
                         </div> 
-                        <input className='form-control' type='submit' value='Add Road' />
+                        <div className='form-group'>
+                            <input className='form-control' type='submit' value='Add Road' />
+                        </div>
                     </form>
-                    <form className='form-inline' onSubmit={e => this.handlePassSubmit(e)}>
+                    <form className='form' onSubmit={e => this.handlePassSubmit(e)}>
                         <div className='form-group'>
                             <label htmlFor='Duration'>Duration: </label>
                             <input className='form-control' type='number' name='Duration' 
                                     onChange={e => this.handleDurationChange(e)} />
                         </div> 
-                        <input className='form-control' type='submit' value='Add Pass' />
+                        <div className='form-group'>
+                            <input className='form-control' type='submit' value='Add Pass' />
+                        </div>
                     </form>
                     <input className='form-control' type='button' value='Cancel' onClick={e => this.cancelClickHandler(e)}/>
                 </div>);
     }
 
     cancelClickHandler(e){
-        e.stopPropagation();
-        this.props.onCancelAdd();
+        this.props.onExit(e);
     }
 
     handleNameChange(e){

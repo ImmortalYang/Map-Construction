@@ -7,28 +7,3 @@
 <h2>Map</h2>
 
 <div id="map-root"></div>
-<div class="map">
-    @for (int row = 1; row <= 20; row++)
-    {
-        
-            @for(int col = 1; col <= 20; col++)
-            {
-                <div class="map__unit" data-row-index="@row" data-col-index="@col"></div>
-            }
-        
-    }
-</div>
-<script type="text/javascript">
-@foreach(var city in Model.Cities)
-{
-    @:$(".map__unit[data-row-index='@city.Y'][data-col-index='@city.X']").addClass('map__unit--city');
-}
-@foreach(var road in Model.Roads)
-{
-    @:$(".map__unit[data-row-index='@road.Y'][data-col-index='@road.X']").addClass('map__unit--road-@road.Orientation');
-}
-@foreach(var pass in Model.Passes)
-{
-    @:$(".map__unit[data-row-index='@pass.Y'][data-col-index='@pass.X']").addClass('map__unit--pass');
-}
-</script>

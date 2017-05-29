@@ -9794,7 +9794,7 @@ var AddForm = function (_React$Component) {
                 { className: 'form-popup' },
                 _react2.default.createElement(
                     'form',
-                    { className: 'form-inline', onSubmit: function onSubmit(e) {
+                    { className: 'form', onSubmit: function onSubmit(e) {
                             return _this2.handleCitySubmit(e);
                         } },
                     _react2.default.createElement(
@@ -9810,11 +9810,15 @@ var AddForm = function (_React$Component) {
                                 return _this2.handleNameChange(e);
                             } })
                     ),
-                    _react2.default.createElement('input', { className: 'form-control', type: 'submit', value: 'Add City' })
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-group' },
+                        _react2.default.createElement('input', { className: 'form-control', type: 'submit', value: 'Add City' })
+                    )
                 ),
                 _react2.default.createElement(
                     'form',
-                    { className: 'form-inline', onSubmit: function onSubmit(e) {
+                    { className: 'form', onSubmit: function onSubmit(e) {
                             return _this2.handleRoadSubmit(e);
                         } },
                     _react2.default.createElement(
@@ -9868,11 +9872,15 @@ var AddForm = function (_React$Component) {
                             )
                         )
                     ),
-                    _react2.default.createElement('input', { className: 'form-control', type: 'submit', value: 'Add Road' })
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-group' },
+                        _react2.default.createElement('input', { className: 'form-control', type: 'submit', value: 'Add Road' })
+                    )
                 ),
                 _react2.default.createElement(
                     'form',
-                    { className: 'form-inline', onSubmit: function onSubmit(e) {
+                    { className: 'form', onSubmit: function onSubmit(e) {
                             return _this2.handlePassSubmit(e);
                         } },
                     _react2.default.createElement(
@@ -9888,7 +9896,11 @@ var AddForm = function (_React$Component) {
                                 return _this2.handleDurationChange(e);
                             } })
                     ),
-                    _react2.default.createElement('input', { className: 'form-control', type: 'submit', value: 'Add Pass' })
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'form-group' },
+                        _react2.default.createElement('input', { className: 'form-control', type: 'submit', value: 'Add Pass' })
+                    )
                 ),
                 _react2.default.createElement('input', { className: 'form-control', type: 'button', value: 'Cancel', onClick: function onClick(e) {
                         return _this2.cancelClickHandler(e);
@@ -9898,8 +9910,7 @@ var AddForm = function (_React$Component) {
     }, {
         key: 'cancelClickHandler',
         value: function cancelClickHandler(e) {
-            e.stopPropagation();
-            this.props.onCancelAdd();
+            this.props.onExit(e);
         }
     }, {
         key: 'handleNameChange',
@@ -10082,18 +10093,23 @@ var MapUnit = function (_React$Component) {
                     } },
                 _react2.default.createElement(
                     'div',
-                    { className: 'map__unit__float-tag' },
+                    { className: 'map__unit__float-tag map__unit__float-tag--attr' },
                     floating_tag
                 ),
                 this.state.showForm && this.state.forms,
                 this.state.hover && this.state.unitType !== '' && _react2.default.createElement(
                     'div',
-                    { className: 'form-popup form-popup--delete', onClick: function onClick(e) {
+                    { className: 'map__unit__float-tag map__unit__float-tag--del', onClick: function onClick(e) {
                             return _this2.onDelete(e);
                         } },
                     'X'
                 )
             );
+            {
+                this.state.showForm && _react2.default.createElement('div', { className: 'form-popup__background', onClick: function onClick(e) {
+                        return _this2.onExitForm(e);
+                    } });
+            }
         }
     }, {
         key: 'clickHandler',
@@ -10103,8 +10119,8 @@ var MapUnit = function (_React$Component) {
             if (this.state.unitType === '' && this.state.forms != null) {
                 this.setState({
                     forms: [_react2.default.createElement(_AddForm2.default, { key: 0, position: this.props.position,
-                        onCancelAdd: function onCancelAdd() {
-                            return _this3.onCancel();
+                        onExit: function onExit(e) {
+                            return _this3.onExitForm(e);
                         },
                         onCitySubmit: function onCitySubmit(city) {
                             return _this3.onAddCity(city);
@@ -10173,6 +10189,7 @@ var MapUnit = function (_React$Component) {
                         hover: false
                     });
                 } else {
+                    e.dataTransfer.dropEffect = 'none';
                     alert(data);
                 }
             }).promise(); //end $.get  
@@ -10190,8 +10207,9 @@ var MapUnit = function (_React$Component) {
             }
         }
     }, {
-        key: 'onCancel',
-        value: function onCancel() {
+        key: 'onExitForm',
+        value: function onExitForm(e) {
+            e.stopPropagation();
             this.setState({
                 showForm: false
             });
