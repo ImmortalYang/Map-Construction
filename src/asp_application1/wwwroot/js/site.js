@@ -10002,6 +10002,12 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var hostname = document.location.hostname;
+var sitepath = "/";
+if (hostname.indexOf("unitec") !== -1) {
+    sitepath = "/zhangj188/asp_application1/";
+}
+
 var MapUnit = function (_React$Component) {
     _inherits(MapUnit, _React$Component);
 
@@ -10175,7 +10181,7 @@ var MapUnit = function (_React$Component) {
                 case 'pass':
                     controllerSlug = 'Passes';break;
             }
-            $.get('/' + controllerSlug + '/EditMove', { fromX: fromUnit.x,
+            $.get(sitepath + controllerSlug + '/EditMove', { fromX: fromUnit.x,
                 fromY: fromUnit.y,
                 toX: this.props.position.x,
                 toY: this.props.position.y }, function (data) {
@@ -10219,7 +10225,7 @@ var MapUnit = function (_React$Component) {
         value: function onAddCity(city) {
             var _this5 = this;
 
-            $.get('/Cities/CreateFromGraph', city, function (data) {
+            $.get(sitepath + 'Cities/CreateFromGraph', city, function (data) {
                 if (data === 'success') {
                     _this5.setState({
                         unitType: 'city',
@@ -10237,7 +10243,7 @@ var MapUnit = function (_React$Component) {
         value: function onAddRoad(road) {
             var _this6 = this;
 
-            $.get('/Roads/CreateFromGraph', road, function (data) {
+            $.get(sitepath + 'Roads/CreateFromGraph', road, function (data) {
                 if (data === 'success') {
                     _this6.setState({
                         unitType: 'road',
@@ -10255,7 +10261,7 @@ var MapUnit = function (_React$Component) {
         value: function onAddPass(pass) {
             var _this7 = this;
 
-            $.get('/Passes/CreateFromGraph', pass, function (data) {
+            $.get(sitepath + 'Passes/CreateFromGraph', pass, function (data) {
                 if (data === 'success') {
                     _this7.setState({
                         unitType: 'pass',
@@ -10284,7 +10290,7 @@ var MapUnit = function (_React$Component) {
                     controllerSlug = 'Passes';break;
             }
 
-            $.get('/' + controllerSlug + '/DeleteFromGraph', { x: this.props.position.x, y: this.props.position.y }, function (data) {
+            $.get(sitepath + controllerSlug + '/DeleteFromGraph', { x: this.props.position.x, y: this.props.position.y }, function (data) {
                 if (data === 'success') {
                     _this8.setState({
                         unitType: '',
@@ -10325,9 +10331,14 @@ var _Map2 = _interopRequireDefault(_Map);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var hostname = document.location.hostname;
+var sitepath = "/";
+if (hostname.indexOf("unitec") !== -1) {
+  sitepath = "/zhangj188/asp_application1/";
+}
 var root = document.getElementById('map-root');
 if (root !== null) {
-  _reactDom2.default.render(_react2.default.createElement(_Map2.default, { url: '/MapUnits/GetIndexViewModelJsonAsync' }), document.getElementById('map-root'));
+  _reactDom2.default.render(_react2.default.createElement(_Map2.default, { url: sitepath + 'MapUnits/GetIndexViewModelJsonAsync' }), document.getElementById('map-root'));
 }
 
 /***/ }),

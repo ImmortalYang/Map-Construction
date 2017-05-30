@@ -1,6 +1,12 @@
 ﻿import React from 'react';
 import AddForm from './AddForm';
 
+var hostname = document.location.hostname;
+var sitepath = "/";
+if (hostname.indexOf("unitec") !== -1) {
+        sitepath = "/zhangj188/asp_application1/";
+    }
+
 class MapUnit extends React.Component{
     constructor(props){
         super(props);
@@ -104,7 +110,7 @@ class MapUnit extends React.Component{
             case 'road': controllerSlug = 'Roads'; break;
             case 'pass': controllerSlug = 'Passes'; break;
         }
-        $.get('/' + controllerSlug + '/EditMove', 
+        $.get(sitepath + controllerSlug + '/EditMove', 
                 {fromX: fromUnit.x, 
                  fromY: fromUnit.y, 
                  toX: this.props.position.x, 
@@ -147,7 +153,7 @@ class MapUnit extends React.Component{
     }
 
     onAddCity(city){
-        $.get('/Cities/CreateFromGraph', city, (data) => {
+        $.get(sitepath + 'Cities/CreateFromGraph', city, (data) => {
             if(data === 'success'){
                 this.setState({
                     unitType: 'city', 
@@ -163,7 +169,7 @@ class MapUnit extends React.Component{
     }
 
     onAddRoad(road){
-        $.get('/Roads/CreateFromGraph', road, (data) => {
+        $.get(sitepath + 'Roads/CreateFromGraph', road, (data) => {
             if(data === 'success'){
                 this.setState({
                     unitType: 'road', 
@@ -179,7 +185,7 @@ class MapUnit extends React.Component{
     }
 
     onAddPass(pass){
-        $.get('/Passes/CreateFromGraph', pass, (data) => {
+        $.get(sitepath + 'Passes/CreateFromGraph', pass, (data) => {
             if(data === 'success'){
                 this.setState({
                     unitType: 'pass', 
@@ -203,7 +209,7 @@ class MapUnit extends React.Component{
             case 'pass': controllerSlug = 'Passes'; break;
         }
 
-        $.get('/' + controllerSlug + '/DeleteFromGraph', {x: this.props.position.x, y: this.props.position.y} ,(data) => {
+        $.get(sitepath + controllerSlug + '/DeleteFromGraph', {x: this.props.position.x, y: this.props.position.y} ,(data) => {
             if(data === 'success'){
                 this.setState({
                     unitType: '', 

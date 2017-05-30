@@ -67,7 +67,7 @@ namespace asp_application1.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("asp_application1.Models.City", b =>
+            modelBuilder.Entity("asp_application1.Models.MapUnit", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
@@ -76,7 +76,7 @@ namespace asp_application1.Data.Migrations
 
                     b.Property<int>("Cost");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Discriminator")
                         .IsRequired();
 
                     b.Property<int>("X");
@@ -87,51 +87,9 @@ namespace asp_application1.Data.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("City");
-                });
+                    b.ToTable("MapUnit");
 
-            modelBuilder.Entity("asp_application1.Models.Pass", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ApplicationUserId");
-
-                    b.Property<int>("Cost");
-
-                    b.Property<int>("Duration");
-
-                    b.Property<int>("X");
-
-                    b.Property<int>("Y");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("Pass");
-                });
-
-            modelBuilder.Entity("asp_application1.Models.Road", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ApplicationUserId");
-
-                    b.Property<int>("Cost");
-
-                    b.Property<int>("Orientation");
-
-                    b.Property<int>("X");
-
-                    b.Property<int>("Y");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("Road");
+                    b.HasDiscriminator<string>("Discriminator").HasValue("MapUnit");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
@@ -243,22 +201,54 @@ namespace asp_application1.Data.Migrations
 
             modelBuilder.Entity("asp_application1.Models.City", b =>
                 {
-                    b.HasOne("asp_application1.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Cities")
-                        .HasForeignKey("ApplicationUserId");
+                    b.HasBaseType("asp_application1.Models.MapUnit");
+
+                    b.Property<string>("ApplicationUserId1");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasIndex("ApplicationUserId1");
+
+                    b.ToTable("City");
+
+                    b.HasDiscriminator().HasValue("City");
                 });
 
             modelBuilder.Entity("asp_application1.Models.Pass", b =>
                 {
-                    b.HasOne("asp_application1.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Passes")
-                        .HasForeignKey("ApplicationUserId");
+                    b.HasBaseType("asp_application1.Models.MapUnit");
+
+                    b.Property<string>("ApplicationUserId1");
+
+                    b.Property<int>("Duration");
+
+                    b.HasIndex("ApplicationUserId1");
+
+                    b.ToTable("Pass");
+
+                    b.HasDiscriminator().HasValue("Pass");
                 });
 
             modelBuilder.Entity("asp_application1.Models.Road", b =>
                 {
+                    b.HasBaseType("asp_application1.Models.MapUnit");
+
+                    b.Property<string>("ApplicationUserId1");
+
+                    b.Property<int>("Orientation");
+
+                    b.HasIndex("ApplicationUserId1");
+
+                    b.ToTable("Road");
+
+                    b.HasDiscriminator().HasValue("Road");
+                });
+
+            modelBuilder.Entity("asp_application1.Models.MapUnit", b =>
+                {
                     b.HasOne("asp_application1.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Roads")
+                        .WithMany()
                         .HasForeignKey("ApplicationUserId");
                 });
 
@@ -297,6 +287,27 @@ namespace asp_application1.Data.Migrations
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("asp_application1.Models.City", b =>
+                {
+                    b.HasOne("asp_application1.Models.ApplicationUser")
+                        .WithMany("Cities")
+                        .HasForeignKey("ApplicationUserId1");
+                });
+
+            modelBuilder.Entity("asp_application1.Models.Pass", b =>
+                {
+                    b.HasOne("asp_application1.Models.ApplicationUser")
+                        .WithMany("Passes")
+                        .HasForeignKey("ApplicationUserId1");
+                });
+
+            modelBuilder.Entity("asp_application1.Models.Road", b =>
+                {
+                    b.HasOne("asp_application1.Models.ApplicationUser")
+                        .WithMany("Roads")
+                        .HasForeignKey("ApplicationUserId1");
                 });
         }
     }
