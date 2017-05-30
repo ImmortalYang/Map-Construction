@@ -3,6 +3,7 @@
 /// <reference path="../gulp/tasks/min.js" />
 /// <reference path="../gulp/tasks/scripts.js" />
 /// <reference path="../gulp/tasks/watch.js" />
+/// <reference path="../gulpfile.js" />
 /// <reference path="../webpack.config.js" />
 /// <reference path="js/site.js" />
 /// <reference path="lib/bootstrap/dist/js/bootstrap.js" />
